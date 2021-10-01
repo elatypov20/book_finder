@@ -56,7 +56,7 @@ public class LibraryDatabase extends Database{
 
 class Database {
     protected List<List<String>> rows;
-    protected File file;
+    protected FileReader file;
 
     protected Database(FileReader file){
         file = file;
@@ -68,7 +68,6 @@ class Database {
         // TODO
         // when some rows are changed
         // imlement uploading changes to the disk
-
-        return null;
+        
     }
 }
