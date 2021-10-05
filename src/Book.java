@@ -1,34 +1,42 @@
 import java.util.ArrayList;
 
 public class Book{
-    private int id;
-    private String author;
-    private String name;
-    private ArrayList<String> category;
-    private int pages;
-    private Status status;
-    private Location location;
+    private final int id;
+    private final String author;
+    private final String name;
+    private final ArrayList<String> category;
+    private final int pages;
+    private final Status status;
+    private final Location location;
 
     public Book(int id, String author, String name, ArrayList<String> category,
-                int pages, Status status, Location location) {/*TODO*/}
+                int pages, Status status, Location location) {
+        this.id = id;
+        this.author = author;
+        this.name = name;
+        this.category = category;
+        this.pages = pages;
+        this.status = status;
+        this.location = location;
+    }
 
-    public int getId(){/*TODO*/ return 0;}
+    public int getId(){ return this.id;}
 
-    public String getAuthor(){/*TODO*/ return "";}
+    public String getAuthor(){ return this.author;}
 
-    public String getName(){/*TODO*/ return "";}
+    public String getName(){ return this.name;}
 
-    public ArrayList<String> getCategory(){/*TODO*/ return null;}
+    public ArrayList<String> getCategory(){ return this.category;}
 
-    public int getPages(){/*TODO*/ return 0;}
+    public int getPages(){ return this.pages;}
 
-    public Status getStatus(){/*TODO*/ return null;}
+    public Status getStatus(){ return this.status;}
 
-    public Location getLocation(){/*TODO*/ return null;}
+    public Location getLocation(){ return this.location;}
 
     public int countAvailable(){
         /*
-        * TODO
+        * 
         *
         * implement this method to demonstrate explicit usage
         *  of Singleton pattern in out program from separate places.
@@ -36,7 +44,11 @@ public class Book{
         * Just get instance of database (Singleton) and via loop
         * count how many instances of this book are available at the moment
         * */
-        return 0;
+        int count = 0;
+        for (Book book: LibraryDatabase.getInstance().getBooks()) {
+            if (book.getAuthor().equals(this.author) && book.getName().equals(this.name)) count++;
+        }
+        return count;
     }
 }
 
@@ -46,13 +58,17 @@ enum Status {
 }
 
 class Location{
-    private int shelf, row, column;
+    private final int shelf, row, column;
 
-    public Location(int shelf, int row, int column){/*TODO*/}
+    public Location(int shelf, int row, int column){
+        this.shelf = shelf;
+        this.row = row;
+        this.column = column;
+    }
 
-    public int getShelf(){/*TODO*/ return 0;}
+    public int getShelf(){ return this.shelf;}
 
-    public int getRow(){/*TODO*/ return 0;}
+    public int getRow(){ return this.row;}
 
-    public int getColumn(){/*TODO*/ return 0;}
+    public int getColumn(){ return this.column;}
 }
