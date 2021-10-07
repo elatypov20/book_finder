@@ -1,0 +1,314 @@
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+
+public class UserInterface{
+
+    /**
+     * manages user to enter valid integer input
+     * @return int
+     */
+    static int getCommand(){
+
+        Scanner myObj = new Scanner(System.in);  // Create a Scanner object
+
+        int foo;
+
+        while (true){
+            try {
+                System.out.print("Enter number >> ");
+
+                String input = myObj.nextLine();  // Read user input
+                foo = Integer.parseInt(input);
+                break;
+            }
+            catch (NumberFormatException e)
+            {
+                System.out.println("Please enter only digit!!!");
+            }
+
+        }
+        return foo;
+    }
+
+
+    /**
+     * To print Book description and allows user to borrow book if available
+     * @param lb instance of LibraryDatabase class
+     * @param book book that's chosen by user
+     */
+    static void bookDescription(LibraryDatabase lb, Book book) throws FileNotFoundException{
+
+        System.out.println("\n-----------------------------------------");
+        System.out.println("BOOK DESCRIPTION");
+        System.out.println("-----------------------------------------");
+
+        System.out.println("ID: "+book.getId());
+        System.out.println("Name: "+ book.getName());
+        System.out.println("Author: "+book.getAuthor());
+        System.out.println("Category: "+book.getCategory());
+        System.out.println("Year: "+book.getYear());
+        System.out.println("Pages: "+book.getPages());
+        Location location = book.getLocation();
+        System.out.println("Location -> "+"shelf: "+location.getShelf()+" column: "+location.getColumn()+" row: "+location.getRow());
+        System.out.println("Status: "+ (book.getStatus() == Status.STATUS_AVAILABLE ? "Available" : "Not available"));
+
+        if (book.getStatus() == Status.STATUS_AVAILABLE){
+            System.out.println("------------------------------------");
+            System.out.println("0 -> Borrow book");
+            System.out.println("1 -> Go Back");
+            int n = getCommand();
+
+            while (true){
+                if (n==0) {
+                    lb.borrowBook(book.getId());
+                    System.out.println("You have successfully borrowed book with id = " + book.getId());
+                    break;
+                }
+                else if(n==1){
+                    startUISession();
+                }
+                else {
+                    System.out.println("Please enter only command numbers!");
+                    n = getCommand();
+                }
+
+            }
+
+        }
+        else {
+            System.out.println("Sorry you cannot borrow this book!");
+        }
+        startUISession();
+    }
+
+
+    /**
+     * Handles search typing
+     * Prints suitable results
+     *
+     * @param lb library database
+     * @param option "author" or "name" (mode)
+     */
+    static void searchType(LibraryDatabase lb, String option) throws FileNotFoundException{
+
+        System.out.println("\n-----------------------------------------");
+        if (option.equals("name")){
+            System.out.println("SEARCHING BY NAME");
+        } else {
+            System.out.println("SEARCHING BY AUTHOR");
+        }
+
+        Scanner myObj = new Scanner(System.in);
+
+        System.out.println("-----------------------------------------");
+
+        System.out.println("0 -> Go Back");
+        System.out.print("Please choose commands or Search: ");
+        String input = myObj.nextLine();
+
+        List<Book> books = new ArrayList<>();
+
+
+        if (input.equals("0")) {
+            doSearch();
+        }
+        else {
+            if (option.equals("name")){
+                books = lb.searchByName(input);
+            }
+            else {
+                books = lb.searchByAuthor(input);
+            }
+        }
+
+        System.out.println("--------------------------------");
+
+
+        if (books.size()>0){
+            System.out.println("FOUND RESULTS: ");
+            for (int i=0; i<books.size(); i++){
+                System.out.println(i+" --> "+books.get(i).getName() +" BY: "+books.get(i).getAuthor());
+            }
+
+            System.out.println("Choose book from results");
+
+            int n = getCommand();
+
+            while (true){
+                if (n<=books.size()){
+                    bookDescription(LibraryDatabase.getInstance(), books.get(n));
+                    break;
+
+                }
+                else{
+                    System.out.println("Enter only number before results");
+                    n = getCommand();
+
+                }
+
+            }
+
+        }
+        else {
+            System.out.println("No results found for <"+input+">");
+        }
+
+    }
+
+    /**
+     * Handles searching action
+     *
+     * Can perform searching by book name or by author
+     *
+     */
+    static void doSearch() throws FileNotFoundException{
+        System.out.println("\n-----------------------------------------");
+        System.out.println("SEARCHING!");
+
+        System.out.println("-----------------------------------------");
+
+        System.out.println("Please choose following commands:");
+        System.out.println("0 -> Search by Name");
+        System.out.println("1 -> Search by Author");
+        System.out.println("2 -> Go Back");
+
+        int n = getCommand();
+
+        while (true) {
+            if (n == 0) {
+                searchType(LibraryDatabase.getInstance(), "name");
+                break;
+            } else if (n == 1) {
+                searchType(LibraryDatabase.getInstance(),"author");
+                break;
+            } else if (n == 2) {
+                startUISession();
+                break;
+            } else {
+                System.out.println("Please enter only command numbers!");
+                n = getCommand();
+            }
+        }
+    }
+
+
+    /**
+     * allows adding book  to library dynamically
+     * (if for example student wants to make book donation for library)
+     *
+     * @param lb LibraryDatabase instance
+     */
+    static void addBook(LibraryDatabase lb) throws FileNotFoundException{
+        System.out.println("\n-----------------------------------------");
+        System.out.println("ADDING NEW BOOK");
+
+        System.out.println("Please add information about new Book!");
+        Scanner myObj = new Scanner(System.in);
+
+        System.out.println("-----------------------------------------");
+
+        System.out.print("Book name: ");
+        String name = myObj.nextLine();
+
+        System.out.print("Book Author name: ");
+        String author = myObj.nextLine();
+
+        System.out.print("Book category: ");
+        String category = myObj.nextLine();
+
+        System.out.print("Realized year: ");
+        int year = Integer.parseInt(myObj.nextLine());
+
+        System.out.print("Number of Pages: ");
+        int pages = Integer.parseInt(myObj.nextLine());
+
+        System.out.print("Number of Shelf: ");
+        int shelf = Integer.parseInt(myObj.nextLine());
+
+        System.out.print("Number of Row: ");
+        int row = Integer.parseInt(myObj.nextLine());
+
+        System.out.print("Number of Column: ");
+        int column = Integer.parseInt(myObj.nextLine());
+
+        Book newBook = new Book(lb.getFreeId(), author, name, category, pages, Status.STATUS_AVAILABLE, new Location(shelf, row, column), year);
+        lb.addBook(newBook);
+
+        System.out.println("Book is successfully added!");
+
+        startUISession();
+    }
+
+
+    /**
+     * Handles returning book action by taking book id parameter
+     * @param lb LibraryDatabase class instance
+     */
+    static void returnBook(LibraryDatabase lb) throws FileNotFoundException{
+        System.out.println("\n-----------------------------------------");
+        System.out.println("RETURNING BOOK");
+        System.out.println("-----------------------------------------");
+        int n = getCommand();
+
+
+        if (lb.returnBook(n)){
+
+            System.out.println("<Book has been successfully returned>");
+        }
+        else {
+            System.out.println("<Book cannot be returned!!!>");
+        }
+
+
+        startUISession();
+    }
+
+    /**
+     *  This function call first it's main page where user can do 4 function
+     *      Searching book
+     *      return book
+     *      add new book
+     *      exit from program
+     */
+    public static void startUISession() throws FileNotFoundException{
+        System.out.println("-----------------------------------------");
+        System.out.println("Welcome to Book Finder");
+        System.out.println("-----------------------------------------");
+        System.out.println("Please choose following commands:");
+        System.out.println("0 -> Search");
+        System.out.println("1 -> Return book");
+        System.out.println("2 -> Add new book");
+        System.out.println("3 -> Exit");
+
+        int n = getCommand();
+
+        while (true){
+
+            if (n==0){
+
+                doSearch();
+                break;
+            }
+            else if (n==1){
+                returnBook(LibraryDatabase.getInstance());
+                break;
+            }
+            else if (n==2){
+                addBook(LibraryDatabase.getInstance());
+                break;
+            }
+            else if (n==3){
+                System.out.println("Good bye!");
+                break;
+            }
+
+            else {
+                System.out.println("Please enter only command numbers!");
+                n = getCommand();
+            }
+        }
+    }
+}
