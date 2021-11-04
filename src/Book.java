@@ -98,7 +98,7 @@ public class Book{
      */
     public int countAvailable() throws FileNotFoundException {
         int cnt = 0;
-        for(Book book : LibraryDatabase.getInstance().getBooks()){
+        for(Book book : LibraryDatabaseClient.getInstance().getBooks()){
             if(book.name.equals(this.name) && book.author.equals(this.author) && book.getStatus() == Status.STATUS_AVAILABLE) cnt++;
         }
         return cnt;

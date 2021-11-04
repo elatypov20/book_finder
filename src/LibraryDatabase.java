@@ -12,24 +12,19 @@ import java.util.Scanner;
  */
 public class LibraryDatabase extends Database{
     private final List<Book> books;
-    private static LibraryDatabase instance;
 
     /**
-     * creates instance of LibraryDatabase, but can
-     * be called only inside LibraryDatabase class.
-     * This is done to implement Singleton pattern.
-     *
      * It reads database and parses its data to create
      * list of books, with which we will perform actions in future
      *
      * @throws FileNotFoundException if file not found
      */
-    private LibraryDatabase() throws FileNotFoundException{
+    public LibraryDatabase() throws FileNotFoundException {
         super("database.csv");
 
         books = new ArrayList<>();
 
-        for(List<String> row : rows){
+        for (List<String> row : rows) {
             String name = row.get(0);
             String author = row.get(1);
             String category = row.get(2);
@@ -42,30 +37,19 @@ public class LibraryDatabase extends Database{
             int[] location = new int[3];
             int h = 1, j = 0;
             String s = row.get(5);
-            for (int i = 1; i < s.length() - 1; i ++){
-                if (s.charAt(i) == ','){
-                    i ++; h = 1; j ++;
-                }
-                else{
-                    location[j] = location[j] * h + Character.getNumericValue(s.charAt(i)); h *= 10;
+            for (int i = 1; i < s.length() - 1; i++) {
+                if (s.charAt(i) == ',') {
+                    i++;
+                    h = 1;
+                    j++;
+                } else {
+                    location[j] = location[j] * h + Character.getNumericValue(s.charAt(i));
+                    h *= 10;
                 }
             }
-            Book newBook = new Book (id, author, name, category, page, status, new Location (location[0], location[1], location[2]), year);
-            books.add (newBook);
+            Book newBook = new Book(id, author, name, category, page, status, new Location(location[0], location[1], location[2]), year);
+            books.add(newBook);
         }
-    }
-
-    /**
-     * Singleton implementation
-     *
-     * @return the only 1 existing instance in all program
-     * @throws FileNotFoundException if LibraryDatabase can't be created
-     */
-    public static LibraryDatabase getInstance() throws FileNotFoundException {
-        if (instance == null)
-            instance = new LibraryDatabase();
-
-        return instance;
     }
 
     /**
@@ -108,6 +92,7 @@ public class LibraryDatabase extends Database{
         }
         return founded;
     }
+    // TODO DELETE SEARCH
 
 
     /**
@@ -191,6 +176,35 @@ public class LibraryDatabase extends Database{
         flush();
     }
 }
+
+/**
+ * This class extends LibraryDatabase
+ */
+class LibraryDatabaseClient extends LibraryDatabase{
+    private static LibraryDatabaseClient instance;
+
+    public LibraryDatabaseClient() throws FileNotFoundException {
+        super();
+    }
+
+    /**
+     * creates instance of LibraryDatabaseClient, but can
+     * be called only inside LibraryDatabaseClient class.
+     * This is done to implement Singleton pattern.
+     *
+     * Singleton implementation
+     *
+     * @return the only 1 existing instance in all program
+     * @throws FileNotFoundException if LibraryDatabase can't be created
+     */
+    public static LibraryDatabaseClient getInstance() throws FileNotFoundException {
+        if (instance == null)
+            instance = new LibraryDatabaseClient();
+
+        return instance;
+    }
+}
+
 
 /**
  * This class provides basic methods

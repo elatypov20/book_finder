@@ -6,13 +6,45 @@ import java.util.Scanner;
 
 public class UserInterface{
 
+    private BookFilter filter;
+    private final Scanner myObj;
+
+    public UserInterface(BookFilter filter){
+        this.filter = filter;
+        myObj = new Scanner(System.in);
+    }
+
+    public void addKeywordFilter(String keyword){
+        this.filter = new KeywordFilter(filter, keyword);
+    }
+
+    public void addDateFilter(int start, int end){
+        this.filter = new DateFilter(filter, start, end);
+    }
+
+    public void addAuthorFilter(String name){ this.filter = new AuthorFilter(filter, name); }
+
+    public void resetFilters(){
+        this.filter = null;
+    }
+
+    public boolean isInteger(String s) {
+        try {
+            Integer.parseInt(s);
+        } catch(NumberFormatException e) {
+            return false;
+        }
+        // only got here if we didn't return false
+        return true;
+    }
+
     /**
      * manages user to enter valid integer input
      * @return int
      */
-    static int getCommand(){
+    int getCommand(){
 
-        Scanner myObj = new Scanner(System.in);  // Create a Scanner object
+//        Scanner myObj = new Scanner(System.in);  // Create a Scanner object
 
         int foo;
 
@@ -34,12 +66,65 @@ public class UserInterface{
     }
 
 
+    void readKeywords(){
+        System.out.print("Enter keywords: ");
+        String input = myObj.nextLine();
+
+        for (String keyword: input.split(" "))
+            addKeywordFilter(keyword);
+    }
+
+    void readDates(){
+        int startDate = 0, endDate = 100000;
+
+        System.out.print("Enter start year: ");
+        String sdate = myObj.nextLine();
+
+        if (isInteger(sdate)){
+            startDate = Integer.parseInt(sdate);
+        }
+
+
+        System.out.print("Enter end year: ");
+        String edate = myObj.nextLine();
+
+        if (isInteger(edate)){
+            endDate = Integer.parseInt(edate);
+        }
+
+        if (startDate > endDate){
+            System.out.println("start date can't be greater than end");
+            return;
+        }
+
+        addDateFilter(startDate, endDate);
+    }
+
+
+    void filterMain(LibraryDatabaseClient lb){
+        System.out.println("\n-----------------------------------------");
+        System.out.println("FILTERING");
+        System.out.println("-----------------------------------------");
+
+        System.out.println("REMINDER: If you don't want to filer by specific elements, just leave input empty!");
+
+        readKeywords();
+        readDates();
+
+        try {
+            showBooks(lb, filter.filter(LibraryDatabaseClient.getInstance().getBooks()));
+        } catch (Exception ignored){
+        }
+        resetFilters();
+    }
+
+
     /**
      * To print Book description and allows user to borrow book if available
      * @param lb instance of LibraryDatabase class
      * @param book book that's chosen by user
      */
-    static void bookDescription(LibraryDatabase lb, Book book) throws FileNotFoundException{
+    void bookDescription(LibraryDatabaseClient lb, Book book) throws FileNotFoundException{
 
         System.out.println("\n-----------------------------------------");
         System.out.println("BOOK DESCRIPTION");
@@ -62,12 +147,13 @@ public class UserInterface{
             int n = getCommand();
 
             while (true){
-                if (n==0) {
-                    lb.borrowBook(book.getId());
+                if (n == 0) {
+                    lb.getInstance().borrowBook(book.getId());
                     System.out.println("You have successfully borrowed book with id = " + book.getId());
                     break;
                 }
-                else if(n==1){
+                else if(n == 1){
+                    resetFilters();
                     startUISession();
                 }
                 else {
@@ -84,6 +170,37 @@ public class UserInterface{
         startUISession();
     }
 
+    void showBooks(LibraryDatabaseClient lb, List<Book> books) throws FileNotFoundException{
+        resetFilters();
+        if (books.size()>0){
+            System.out.println("FOUND RESULTS: ");
+            for (int i = 0; i < books.size(); i ++){
+                System.out.println(i+" --> "+books.get(i).getName() +" BY: "+books.get(i).getAuthor());
+            }
+
+            System.out.println("Choose book from results");
+
+            int n = getCommand();
+
+            while (true){
+                if (n<=books.size()){
+                    bookDescription(lb, books.get(n));
+                    break;
+
+                }
+                else{
+                    System.out.println("Enter only number before results");
+                    n = getCommand();
+
+                }
+
+            }
+
+        }
+        else {
+            System.out.println("No results ");
+        }
+    }
 
     /**
      * Handles search typing
@@ -92,7 +209,7 @@ public class UserInterface{
      * @param lb library database
      * @param option "author" or "name" (mode)
      */
-    static void searchType(LibraryDatabase lb, String option) throws FileNotFoundException{
+     void searchType(LibraryDatabaseClient lb, String option) throws FileNotFoundException{
 
         System.out.println("\n-----------------------------------------");
         if (option.equals("name")){
@@ -117,46 +234,23 @@ public class UserInterface{
         }
         else {
             if (option.equals("name")){
-                books = lb.searchByName(input);
+                addKeywordFilter(input);
             }
             else {
-                books = lb.searchByAuthor(input);
+                addAuthorFilter(input);
             }
+
+            if (filter != null)
+                books = filter.filter(lb.getBooks());
         }
 
         System.out.println("--------------------------------");
 
-
-        if (books.size()>0){
-            System.out.println("FOUND RESULTS: ");
-            for (int i=0; i<books.size(); i++){
-                System.out.println(i+" --> "+books.get(i).getName() +" BY: "+books.get(i).getAuthor());
-            }
-
-            System.out.println("Choose book from results");
-
-            int n = getCommand();
-
-            while (true){
-                if (n<=books.size()){
-                    bookDescription(LibraryDatabase.getInstance(), books.get(n));
-                    break;
-
-                }
-                else{
-                    System.out.println("Enter only number before results");
-                    n = getCommand();
-
-                }
-
-            }
-
-        }
-        else {
-            System.out.println("No results found for <"+input+">");
-        }
-
+        showBooks(lb, books);
+        resetFilters();
     }
+
+
 
     /**
      * Handles searching action
@@ -164,7 +258,7 @@ public class UserInterface{
      * Can perform searching by book name or by author
      *
      */
-    static void doSearch() throws FileNotFoundException{
+    void doSearch() throws FileNotFoundException{
         System.out.println("\n-----------------------------------------");
         System.out.println("SEARCHING!");
 
@@ -179,10 +273,12 @@ public class UserInterface{
 
         while (true) {
             if (n == 0) {
-                searchType(LibraryDatabase.getInstance(), "name");
+                searchType(LibraryDatabaseClient.getInstance(), "name");
+                resetFilters();
                 break;
             } else if (n == 1) {
-                searchType(LibraryDatabase.getInstance(),"author");
+                searchType(LibraryDatabaseClient.getInstance(), "author");
+                resetFilters();
                 break;
             } else if (n == 2) {
                 startUISession();
@@ -201,12 +297,12 @@ public class UserInterface{
      *
      * @param lb LibraryDatabase instance
      */
-    static void addBook(LibraryDatabase lb) throws FileNotFoundException{
+    void addBook(LibraryDatabaseClient lb) throws FileNotFoundException{
         System.out.println("\n-----------------------------------------");
         System.out.println("ADDING NEW BOOK");
 
         System.out.println("Please add information about new Book!");
-        Scanner myObj = new Scanner(System.in);
+//        Scanner myObj = new Scanner(System.in);
 
         System.out.println("-----------------------------------------");
 
@@ -247,7 +343,7 @@ public class UserInterface{
      * Handles returning book action by taking book id parameter
      * @param lb LibraryDatabase class instance
      */
-    static void returnBook(LibraryDatabase lb) throws FileNotFoundException{
+    void returnBook(LibraryDatabaseClient lb) throws FileNotFoundException{
         System.out.println("\n-----------------------------------------");
         System.out.println("RETURNING BOOK");
         System.out.println("-----------------------------------------");
@@ -273,7 +369,7 @@ public class UserInterface{
      *      add new book
      *      exit from program
      */
-    public static void startUISession() throws FileNotFoundException{
+    public void startUISession() throws FileNotFoundException{
         System.out.println("-----------------------------------------");
         System.out.println("Welcome to Book Finder");
         System.out.println("-----------------------------------------");
@@ -281,7 +377,8 @@ public class UserInterface{
         System.out.println("0 -> Search");
         System.out.println("1 -> Return book");
         System.out.println("2 -> Add new book");
-        System.out.println("3 -> Exit");
+        System.out.println("3 -> Filter books");
+        System.out.println("4 -> Exit");
 
         int n = getCommand();
 
@@ -293,14 +390,18 @@ public class UserInterface{
                 break;
             }
             else if (n==1){
-                returnBook(LibraryDatabase.getInstance());
+                returnBook(LibraryDatabaseClient.getInstance());
                 break;
             }
             else if (n==2){
-                addBook(LibraryDatabase.getInstance());
+                addBook(LibraryDatabaseClient.getInstance());
                 break;
             }
-            else if (n==3){
+            else if(n==3){
+                filterMain(LibraryDatabaseClient.getInstance());
+                break;
+            }
+            else if (n==4){
                 System.out.println("Good bye!");
                 break;
             }
