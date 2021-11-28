@@ -11,7 +11,7 @@ import java.util.Scanner;
  * And has methods to action with database books
  */
 public class LibraryDatabase extends Database{
-    private final List<Book> books;
+    private final BooksCollection books;
 
     /**
      * It reads database and parses its data to create
@@ -22,7 +22,7 @@ public class LibraryDatabase extends Database{
     public LibraryDatabase() throws FileNotFoundException {
         super("database.csv");
 
-        books = new ArrayList<>();
+        books = new BooksCollection();
 
         for (List<String> row : rows) {
             String name = row.get(0);
@@ -55,44 +55,9 @@ public class LibraryDatabase extends Database{
     /**
      * @return All books from database
      */
-    public List<Book> getBooks(){
+    public BooksCollection getBooks(){
         return books;
     }
-
-    /**
-     * Provides searching in LibraryDatabase by author name
-     *
-     * @param authorName
-     * @return All books that have same author
-     */
-    public List<Book> searchByAuthor(String authorName){
-        List<Book> founded = new ArrayList<Book>();
-
-        for(Book i : books){
-            if(i.getAuthor().toLowerCase().contains(authorName.toLowerCase())){
-                founded.add (i);
-            }
-        }
-        return founded;
-    }
-
-    /**
-     * Provides searching book by name
-     *
-     * @param name book name
-     * @return list of books which contains @param name
-     */
-    public List<Book> searchByName(String name){
-        List<Book> founded = new ArrayList<Book>();
-
-        for(Book i : books){
-            if(i.getName().toLowerCase().contains(name.toLowerCase())){
-                founded.add(i);
-            }
-        }
-        return founded;
-    }
-    // TODO DELETE SEARCH
 
 
     /**
@@ -104,7 +69,9 @@ public class LibraryDatabase extends Database{
      */
     public boolean borrowBook(int id) throws FileNotFoundException {
         int j = 0;
-        for(Book i : books){
+        BooksCollectionIterator bi = books.getIterator();
+        while (bi.hasNext()){
+            Book i = bi.getNext();
             if (i.getId() == id){
                 if (i.getStatus().equals(Status.STATUS_UNAVAILABLE))
                     return false;
@@ -127,7 +94,9 @@ public class LibraryDatabase extends Database{
      */
     public boolean returnBook(int id) throws FileNotFoundException {
         int j = 0;
-        for(Book i : books){
+        BooksCollectionIterator bi = books.getIterator();
+        while (bi.hasNext()){
+            Book i = bi.getNext();
             if(i.getId() == id){
 
                 if (i.getStatus() == Status.STATUS_AVAILABLE)

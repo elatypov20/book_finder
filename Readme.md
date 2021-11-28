@@ -14,9 +14,11 @@
 * Arlan Kuralbayev B20-03 (a.kuralbayev@innopolis.university)
 
 <hr>
-## Note
 
-> As we have class <u>LibraryDatabase</u>, it could seem that it represents connection to database and can break principle of single responsibility. **But** this class was designed in other way: it is some wrapper over low level database, which purpose is to **provide** laconic interfaces specifies only for this special purpose. It is **not** just connection to database, each of its method was designed only to simplify database calls. Therefore, we do not violate SOLID principles here.
+##  Note
+
+
+> As we have class <u>LibraryDatabase</u>, it could seem that it represents connection to database and can break principle of single responsibility. **But** this class was designed in other way: it is some wrapper over low level database, which purpose is to **provide** useful interfaces specified only for this special purpose. It is **not** just connection to database, each of its method was designed only to simplify database calls. Therefore, we do not violate SOLID principles here.
 
 
 
@@ -28,12 +30,7 @@
 <b>Book Finder</b> was developed to organize and manage work of library.
 The library system has Database of books and UI to interact with users. 
 
-<b>Library Database</b> (remote representation of database) stores list of books, which are represented as .csv file. After
-each change the actual information is updating and saving in the file. Books contain name, author, 
-number of pages, category, year of publication, location and status. To make it easier to find
-the book, the application provides the user with information about the shelf, row and column number, 
-where book is located. After borrowing the book becomes inaccessible to other users until 
-it is returned.
+<b>Library Database</b> (remote representation of database) stores list of books, which are represented as .csv file. After each change the actual information is updating and saving in the file. Books contain name, author, number of pages, category, year of publication, location and status. To make it easier to find the book, the application provides the user with information about the shelf, row and column number,  where book is located. After borrowing the book becomes inaccessible to other users until  it is returned.
 
 <b>UserInterface</b> is a wrapper, which provides to the user an opportunity to look for 
 books of interest to him by <i>book name</i> or <i>author name</i>, borrow available books and
@@ -233,7 +230,7 @@ Enter number >>
 <h3>Project structure</h3>
 At the beginning of the program, the control is forwarded into <u>UserInterface</u>'s 
 <b>startUISession</b> function. <u>UserInterface</u> is responsible for any communications
-with user, and each of its function helps with that. It provides laconic interface for user (which is described above).
+with user, and each of its function helps with that.
 During it's work it uses <u>LibraryDatabaseClient</u> which makes requests to <u>LibraryDatabase</u>. <u>LibraryDatabase</u> is a remote Database which stores information about books and provides some basic functionality to manipulate them and update database permanently (even in the disk).
 LibraryDatabase is inherited from <u>Database</u> class, which works with 
 the database file (.csv format) in low level and provides high-level methods 
@@ -251,9 +248,13 @@ about book. Auxiliary class <u>Location</u> represents location of the book. Enu
 
 #####  Assignment 2 addition
 
-We added new class <u>Filter</u> which helps to perform filtering operations. Moreover, we used **Decorator** pattern to implement that. So, it has great flexibility and many new opportunities. We already implemented 3 types of filters: <u>AuthorFilter</u>, <u>KeywordFilter</u> and <u>DateFilter</u> which are the implementations of abstract <u>BookFilter</u> class. They help to filter all existing books by author, keywords and dates respectively. **For example**, if we want to search some book, which has keywords "Python" and "SQL", we can easily do this applying both keywords. As **Decorator** pattern implies nested structure, we can easily apply multiple different filters and have great performance and extensibility. This means that  we can easily implement new filter and it will be easy to integrate it into existing code.
+We added new class <u>Filter</u> which helps to perform filtering operations. Moreover, we used **Decorator** pattern to implement that. We already implemented 3 types of filters: <u>AuthorFilter</u>, <u>KeywordFilter</u> and <u>DateFilter</u> which are the implementations of abstract <u>BookFilter</u> class. They help to filter all existing books by author, keywords and dates respectively. **For example**, if we want to search some book, which has keywords "Python" and "SQL", we can easily do this applying both keywords. Due to **Decorator** pattern we can easily apply multiple different filters and have great extensibility. This means that  we can easily implement new filter and it will be easy to integrate it into existing code.
 
 
+
+##### Assignment 3 addition
+
+We added **Chain of Responsibility**  pattern to make little optimization in filters: if we know that there is no books that satisfy condition of current *Filter*, then there is no need to check conditions of other filters as we know that the result will be empty. Moreover, as a container for Books we use <u>BooksCollection</u> class. For this class we implemented **Iterator** pattern to make it possible to run through the collection of books.
 
 
 
@@ -268,6 +269,12 @@ In this task we used Classic Singleton implementation
 
 Decorator pattern is used to design Filter class. It gives us an opportunity to easily extend our program by adding new filters and apply multiple filters at the same time. More information about this class is given upwards.
 
+### Chain of Responsibility and Iterator usage
+
+look at **Assignment 3 addition**
+
+
+
 
 
 
@@ -278,9 +285,21 @@ Decorator pattern is used to design Filter class. It gives us an opportunity to 
 
 
 
-### Change log
+### Change log (Assignment 2)
 
 * Fix LibraryDatabase usage: now we have separate representation of database in "local" machine (<u>LibraryDatabaseClient</u>) and on the "remote server" (<u>LibraryDatabase</u>). 
 * Add <u>BookFilter</u> class which allows to extends opportunities of searching. It uses **Decorator** pattern.
 * Fix errors in documentation, report.
 * Small fixes in code
+
+
+
+### Change log (Assignment 3)
+
+* Remove boilerplate code from <u>BookFilter</u> class and it's derivatives (move common used code from children to parent)
+* Add <u>BooksCollection</u> class to store collection of books
+* Implement **Iterator** pattern for <u>BooksCollection</u>
+* Implement **Chain of Responsibility**  pattern for filters
+* Fix code problems taking into account previous feedback
+* Make changes in report taking into account feedback
+* Code review, fix bugs

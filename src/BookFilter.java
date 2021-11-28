@@ -1,6 +1,3 @@
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * This class returning list of books by filtering name and date
  */
@@ -15,13 +12,38 @@ abstract class BookFilter{
         this.component = comp;
     }
 
+    public abstract boolean checker(Book book);
 
     /**
      *
      * @param books list of Book class
      * @return list of filtered Book class
      */
-    public abstract List<Book> filter(List<Book> books);
+    public BooksCollection filter(BooksCollection books){
+        BooksCollection filtered = new BooksCollection();
+
+        BooksCollectionIterator bi = books.getIterator();
+        while (bi.hasNext()) {
+            Book book = bi.getNext();
+            if (checker(book))
+                filtered.add(book);
+        }
+
+        if (component == null)
+            return filtered;
+
+
+        // If there is no elements in collection that
+        // satisfy condition of our filter, then there is no
+        // need to check resulting values in other filters
+        // because due to this filter we already know that
+        // result will be an empty array
+        // (Chain of Responsibility pattern)
+        if (filtered.size() == 0)
+            return filtered;
+
+        return component.filter(filtered);
+    }
 }
 
 /**
@@ -41,23 +63,10 @@ class KeywordFilter extends BookFilter{
         this.keyword = keyword;
     }
 
-    /**
-     *
-     * @param books list of Book class
-     * @return list of filtered Book class
-     */
-    @Override
-    public List<Book> filter(List<Book> books) {
-        ArrayList<Book> filtered = new ArrayList<>();
-        for (Book book : books) {
-            if (book.getName().contains(this.keyword)) {
-                filtered.add(book);
-            }
-        }
 
-        if (component == null)
-            return filtered;
-        return component.filter(filtered);
+    @Override
+    public boolean checker(Book book) {
+        return book.getName().toLowerCase().contains(this.keyword.toLowerCase());
     }
 }
 
@@ -81,23 +90,9 @@ class DateFilter extends BookFilter{
     }
 
 
-    /**
-     *
-     * @param books list of Book class
-     * @return list of filtered Book class
-     */
     @Override
-    public List<Book> filter(List<Book> books) {
-        ArrayList<Book> filtered = new ArrayList<>();
-        for (Book book : books) {
-            if (book.getYear() <= this.endYear && this.startYear <= book.getYear()) {
-                filtered.add(book);
-            }
-        }
-
-        if (component == null)
-            return filtered;
-        return component.filter(filtered);
+    public boolean checker(Book book) {
+        return book.getYear() <= this.endYear && this.startYear <= book.getYear();
     }
 }
 
@@ -119,22 +114,9 @@ class AuthorFilter extends BookFilter{
         this.authorName=authorName;
     }
 
-    /**
-     *
-     * @param books list of Book class
-     * @return list of filtered Book class
-     */
-    @Override
-    public List<Book> filter(List<Book> books){
-        ArrayList<Book> filtered=new ArrayList<>();
 
-        for(Book book : books){
-            if(book.getAuthor().contains(authorName)){
-                filtered.add(book);
-            }
-        }
-        if(component == null)
-            return filtered;
-        return component.filter(filtered);
+    @Override
+    public boolean checker(Book book) {
+        return book.getAuthor().toLowerCase().contains(authorName.toLowerCase());
     }
 }

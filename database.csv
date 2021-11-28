@@ -28,7 +28,7 @@ Perl Fast & Easy Web Development (Fast & Easy Web Development),Leslie W. Bate,Ba
 .NET Mobile Web Developers Guide. Web Developer's Guide,"Steve Milroy, Ken Cox, Doug Safford, Laura Barker, Amit Kalani and Wei Meng Lee (Auth.)",Web development,2001,415,"[2, 6, 9]",FALSE,27
 Tapestry 5: Building Web Applications: A step-by-step guide to Java Web development with the developer-friendly Apache Tapestry framework,Alexander Kolesnikov,Software engineering,2008,280,"[8, 2, 4]",FALSE,28
 Learn Java for Web Development: Modern Java Web Development,Vishal Layka,Web development,2014,472,"[5, 4, 7]",TRUE,29
-Flask Web Development: Developing Web Applications with Python,Miguel Grinberg,Computer,2014,258,"[5, 5, 6]",TRUE,30
+Flask Web Development: Developing Web Applications with Python,Miguel Grinberg,Computer,2014,258,"[5, 5, 6]",FALSE,30
 Flask Web Development: Developing Web Applications with Python,Miguel Grinberg,Computer,2014,258,"[4, 3, 7]",TRUE,31
 Developing Web Apps with Haskell and Yesod: Safety-Driven Web Development,Michael Snoyman,Science,2015,396,"[9, 4, 7]",TRUE,32
 Developing Web Apps with Haskell and Yesod: Safety-Driven Web Development,Michael Snoyman,Web development,2015,396,"[8, 9, 1]",FALSE,33

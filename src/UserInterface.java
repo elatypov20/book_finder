@@ -1,17 +1,15 @@
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 
 public class UserInterface{
 
     private BookFilter filter;
-    private final Scanner myObj;
+    private final Scanner scanner;
 
     public UserInterface(BookFilter filter){
         this.filter = filter;
-        myObj = new Scanner(System.in);
+        scanner = new Scanner(System.in);
     }
 
     public void addKeywordFilter(String keyword){
@@ -52,7 +50,7 @@ public class UserInterface{
             try {
                 System.out.print("Enter number >> ");
 
-                String input = myObj.nextLine();  // Read user input
+                String input = scanner.nextLine();  // Read user input
                 foo = Integer.parseInt(input);
                 break;
             }
@@ -68,7 +66,7 @@ public class UserInterface{
 
     void readKeywords(){
         System.out.print("Enter keywords: ");
-        String input = myObj.nextLine();
+        String input = scanner.nextLine();
 
         for (String keyword: input.split(" "))
             addKeywordFilter(keyword);
@@ -78,7 +76,7 @@ public class UserInterface{
         int startDate = 0, endDate = 100000;
 
         System.out.print("Enter start year: ");
-        String sdate = myObj.nextLine();
+        String sdate = scanner.nextLine();
 
         if (isInteger(sdate)){
             startDate = Integer.parseInt(sdate);
@@ -86,7 +84,7 @@ public class UserInterface{
 
 
         System.out.print("Enter end year: ");
-        String edate = myObj.nextLine();
+        String edate = scanner.nextLine();
 
         if (isInteger(edate)){
             endDate = Integer.parseInt(edate);
@@ -170,7 +168,7 @@ public class UserInterface{
         startUISession();
     }
 
-    void showBooks(LibraryDatabaseClient lb, List<Book> books) throws FileNotFoundException{
+    void showBooks(LibraryDatabaseClient lb, BooksCollection books) throws FileNotFoundException{
         resetFilters();
         if (books.size()>0){
             System.out.println("FOUND RESULTS: ");
@@ -226,7 +224,7 @@ public class UserInterface{
         System.out.print("Please choose commands or Search: ");
         String input = myObj.nextLine();
 
-        List<Book> books = new ArrayList<>();
+        BooksCollection books = new BooksCollection();
 
 
         if (input.equals("0")) {
@@ -307,28 +305,28 @@ public class UserInterface{
         System.out.println("-----------------------------------------");
 
         System.out.print("Book name: ");
-        String name = myObj.nextLine();
+        String name = scanner.nextLine();
 
         System.out.print("Book Author name: ");
-        String author = myObj.nextLine();
+        String author = scanner.nextLine();
 
         System.out.print("Book category: ");
-        String category = myObj.nextLine();
+        String category = scanner.nextLine();
 
         System.out.print("Realized year: ");
-        int year = Integer.parseInt(myObj.nextLine());
+        int year = Integer.parseInt(scanner.nextLine());
 
         System.out.print("Number of Pages: ");
-        int pages = Integer.parseInt(myObj.nextLine());
+        int pages = Integer.parseInt(scanner.nextLine());
 
         System.out.print("Number of Shelf: ");
-        int shelf = Integer.parseInt(myObj.nextLine());
+        int shelf = Integer.parseInt(scanner.nextLine());
 
         System.out.print("Number of Row: ");
-        int row = Integer.parseInt(myObj.nextLine());
+        int row = Integer.parseInt(scanner.nextLine());
 
         System.out.print("Number of Column: ");
-        int column = Integer.parseInt(myObj.nextLine());
+        int column = Integer.parseInt(scanner.nextLine());
 
         Book newBook = new Book(lb.getFreeId(), author, name, category, pages, Status.STATUS_AVAILABLE, new Location(shelf, row, column), year);
         lb.addBook(newBook);
